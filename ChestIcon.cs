@@ -382,22 +382,29 @@ namespace IconsBuilder
                         Text = Entity.Path.Substring(heistPrefix.Length).Trim();
                         if (!Text.Contains("Secondary"))        // none-secondary chests already have an icon
                         {
-	                        Text = string.Empty;
+                            Text = string.Empty;
                             break;
                         }
 
-                        for (MapIconsIndex rewardIconIndex = MapIconsIndex.RewardAbyss; rewardIconIndex <= MapIconsIndex.RewardWeapons; rewardIconIndex++)
+                        for (MapIconsIndex rewardIconIndex = MapIconsIndex.RewardAbyss; rewardIconIndex <= MapIconsIndex.RewardBlight; rewardIconIndex++)
                         {
                             var indexName = Enum.GetName(typeof(MapIconsIndex), rewardIconIndex);
-                            System.Diagnostics.Debug.Assert(indexName != null && indexName.StartsWith("Reward"));
-                            if (Text.Contains(indexName.Substring("Reward".Length)))
+                            if (indexName.StartsWith("Reward") && Text.Contains(indexName.Substring("Reward".Length)))
                             {
                                 MainTexture.FileName = "Icons.png";
                                 MainTexture.UV = SpriteHelper.GetUV(rewardIconIndex);
                                 goto done;
                             }
                         }
+                        if(Text.Contains("Corrupted"))
+                        {
+                            MainTexture.FileName = "Icons.png";
+                            MainTexture.UV = SpriteHelper.GetUV(MapIconsIndex.IncursionCraftingBench);
+                            goto done;
+                        }
+                        
                         Logger.Log.Warning("Missing icon handling for {0}", Text);
+                        break;
 
                     done: { }
 
