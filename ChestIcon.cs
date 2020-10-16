@@ -378,36 +378,45 @@ namespace IconsBuilder
 
                     break;
                 case ChestType.Heist:
+                    Text = Entity.Path.Substring(heistPrefix.Length).Trim();
+                    if (!Text.Contains("Secondary")) // none-secondary chests already have an icon
                     {
-                        Text = Entity.Path.Substring(heistPrefix.Length).Trim();
-                        if (!Text.Contains("Secondary"))        // none-secondary chests already have an icon
-                        {
-	                        Text = string.Empty;
-                            break;
-                        }
-
-                        for (MapIconsIndex rewardIconIndex = MapIconsIndex.RewardAbyss; rewardIconIndex <= MapIconsIndex.RewardWeapons; rewardIconIndex++)
-                        {
-                            var indexName = Enum.GetName(typeof(MapIconsIndex), rewardIconIndex);
-                            System.Diagnostics.Debug.Assert(indexName != null && indexName.StartsWith("Reward"));
-                            if (Text.Contains(indexName.Substring("Reward".Length)))
-                            {
-                                MainTexture.FileName = "Icons.png";
-                                MainTexture.UV = SpriteHelper.GetUV(rewardIconIndex);
-                                goto done;
-                            }
-                        }
-                        Logger.Log.Warning("Missing icon handling for {0}", Text);
-
-                    done: { }
-
-                        Priority = IconPriority.Critical;
-                        MainTexture.Size = settings.SizeHeistChestIcon;
-                        MainTexture.Color = Color.White;
-                        _HasIngameIcon = false; // override
-                        Text = string.Empty;
+	                    Text = string.Empty;
                         break;
                     }
+
+                    var rewardIconIsFound = false;
+
+                    for (var rewardIconIndex = MapIconsIndex.RewardAbyss; rewardIconIndex <= MapIconsIndex.RewardWeapons; rewardIconIndex++)
+                    {
+                        var rewardName = rewardIconIndex.ToString().Substring("Reward".Length);
+                        if (Text.Contains(rewardName))
+                        {
+                            MainTexture.FileName = "Icons.png";
+                            MainTexture.UV = SpriteHelper.GetUV(rewardIconIndex);
+                            rewardIconIsFound = true;
+                            break;
+                        }
+                    }
+
+                    if (!rewardIconIsFound)
+                    {
+                        Logger.Log.Warning("Missing icon handling for {0}", Text);
+                        Text = Text.Substring("HeistChestSecondary".Length);
+                        MainTexture.FileName = "Icons.png";
+                        MainTexture.UV = SpriteHelper.GetUV(MapIconsIndex.RewardGenericItems); // TODO: make a map from new names to icons
+                    }
+                    else
+                    {
+                        Text = string.Empty;
+                    }
+
+                    Priority = IconPriority.Critical;
+                    MainTexture.Size = settings.SizeHeistChestIcon;
+                    MainTexture.Color = Color.White;
+                    _HasIngameIcon = false; // override
+                    break;
+                    
                 default:
                     throw new ArgumentOutOfRangeException("Chest type not found.");
             }
