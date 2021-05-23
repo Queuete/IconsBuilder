@@ -87,19 +87,19 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="ChestIcon.cs" />
-    <Compile Include="DeliriumIcon.cs" />
+    <Compile Include="Icons\ChestIcon.cs" />
+    <Compile Include="Icons\DeliriumIcon.cs" />
     <Compile Include="IconsBuilder.cs" />
     <Compile Include="IconsBuilderSettings.cs" />
-    <Compile Include="LegionIcon.cs" />
-    <Compile Include="MiscIcon.cs" />
-    <Compile Include="MissionMarkerIcon.cs" />
-    <Compile Include="MonsterIcon.cs" />
-    <Compile Include="NpcIcon.cs" />
-    <Compile Include="PlayerIcon.cs" />
-    <Compile Include="PortalIcon.cs" />
+    <Compile Include="Icons\LegionIcon.cs" />
+    <Compile Include="Icons\MiscIcon.cs" />
+    <Compile Include="Icons\MissionMarkerIcon.cs" />
+    <Compile Include="Icons\MonsterIcon.cs" />
+    <Compile Include="Icons\NpcIcon.cs" />
+    <Compile Include="Icons\PlayerIcon.cs" />
+    <Compile Include="Icons\PortalIcon.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="ShrineIcon.cs" />
+    <Compile Include="Icons\ShrineIcon.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
@@ -112,6 +112,7 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
          Other similar extension points exist, see Microsoft.Common.targets.

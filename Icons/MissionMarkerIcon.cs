@@ -6,7 +6,7 @@ using ExileCore.Shared.Abstract;
 using ExileCore.Shared.Helpers;
 using SharpDX;
 
-namespace IconsBuilder
+namespace IconsBuilder.Icons
 {
     public class MissionMarkerIcon : BaseIcon
     {

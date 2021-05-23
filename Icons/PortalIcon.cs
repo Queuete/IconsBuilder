@@ -2,7 +2,7 @@ using ExileCore;
 using ExileCore.PoEMemory.MemoryObjects;
 using ExileCore.Shared.Abstract;
 
-namespace IconsBuilder
+namespace IconsBuilder.Icons
 {
     public class PortalIcon : BaseIcon
     {

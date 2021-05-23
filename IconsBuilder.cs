@@ -9,6 +9,7 @@ using ExileCore.PoEMemory.MemoryObjects;
 using ExileCore.Shared;
 using ExileCore.Shared.Abstract;
 using ExileCore.Shared.Enums;
+using IconsBuilder.Icons;
 using JM.LinqFaster;
 using SharpDX;
 

@@ -7,7 +7,7 @@ using ExileCore.Shared.Abstract;
 using ExileCore.Shared.Enums;
 using ExileCore.Shared.Helpers;
 
-namespace IconsBuilder
+namespace IconsBuilder.Icons
 {
     public class MiscIcon : BaseIcon
     {

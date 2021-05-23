@@ -10,7 +10,7 @@ using ExileCore.Shared.Helpers;
 using ExileCore.Shared.Static;
 using SharpDX;
 
-namespace IconsBuilder
+namespace IconsBuilder.Icons
 {
     public class ChestIcon : BaseIcon
     {
@@ -23,7 +23,7 @@ namespace IconsBuilder
 
         public void Update(Entity entity, IconsBuilderSettings settings)
         {
-	        const string heistPrefix = "Metadata/Chests/LeagueHeist/";
+            const string heistPrefix = "Metadata/Chests/LeagueHeist/";
 
 
             if (Entity.Path.Contains("BreachChest"))
@@ -56,7 +56,7 @@ namespace IconsBuilder
             Show = () => !Entity.IsOpened;
 
             if (!_HasIngameIcon || CType == ChestType.Heist)
-                MainTexture = new HudTexture {FileName = "sprites.png"};
+                MainTexture = new HudTexture { FileName = "sprites.png" };
             else
             {
                 MainTexture.Size = settings.SizeChestIcon;
@@ -369,11 +369,11 @@ namespace IconsBuilder
                     MainTexture.Size = settings.SizeChestIcon;
 
                     if (Entity.GetComponent<Stats>().StatDictionary.TryGetValue(GameStat.MonsterMinimapIcon, out var minimapIconIndex))
-                        MainTexture.UV = SpriteHelper.GetUV((MapIconsIndex) minimapIconIndex);
+                        MainTexture.UV = SpriteHelper.GetUV((MapIconsIndex)minimapIconIndex);
                     else
                         MainTexture.UV = SpriteHelper.GetUV(MyMapIconsIndex.Divination);
 
-                    Text = ((MapIconsIndex) minimapIconIndex).ToString().Replace("Legion", "");
+                    Text = ((MapIconsIndex)minimapIconIndex).ToString().Replace("Legion", "");
                     MainTexture.Color = Color.White;
 
                     break;
@@ -382,7 +382,7 @@ namespace IconsBuilder
                         Text = Entity.Path.Substring(heistPrefix.Length).Trim();
                         if (!Text.Contains("Secondary"))        // none-secondary chests already have an icon
                         {
-	                        Text = string.Empty;
+                            Text = string.Empty;
                             break;
                         }
 

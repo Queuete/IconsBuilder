@@ -11,7 +11,7 @@ using ExileCore.Shared.Helpers;
 using JM.LinqFaster;
 using SharpDX;
 
-namespace IconsBuilder
+namespace IconsBuilder.Icons
 {
     public class LegionIcon : BaseIcon
     {
