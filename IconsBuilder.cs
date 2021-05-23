@@ -17,18 +17,16 @@ namespace IconsBuilder
 {
     public class IconsBuilder : BaseSettingsPlugin<IconsBuilderSettings>
     {
-        private string ALERT_CONFIG => Path.Combine(DirectoryFullName, "config", "mod_alerts.txt");
-        private string IGNORE_FILE => Path.Combine(DirectoryFullName, "config", "ignored_entities.txt");
+        private string AlertFile => Path.Combine(DirectoryFullName, "config", "mod_alerts.txt");
+        private string IgnoreFile => Path.Combine(DirectoryFullName, "config", "ignored_entities.txt");
         private List<string> IgnoredEntities { get; set; }
-
-        private readonly EntityType[] Chests =
+        private Dictionary<string, Size2> AlertEntitiesWithIconSize { get; set; } = new Dictionary<string, Size2>();
+        private static EntityType[] Chests => new[]
         {
-            EntityType.Chest, EntityType.SmallChest
+            EntityType.Chest,
+            EntityType.SmallChest
         };
-
-        private readonly Dictionary<string, Size2> modIcons = new Dictionary<string, Size2>();
-
-        private readonly EntityType[] SkippedEntity =
+        private static EntityType[] SkippedEntityTypes => new []
         {
             EntityType.WorldItem, 
             EntityType.HideoutDecoration, 
@@ -39,35 +37,35 @@ namespace IconsBuilder
             EntityType.Error
         };
 
-        private Queue<Entity> _entities = new Queue<Entity>(128);
+        private readonly Queue<Entity> _entities = new Queue<Entity>(128);
 
-        private void LoadConfig()
+        private void ReadAlertFile()
         {
-            if (!File.Exists(ALERT_CONFIG))
+            var path = Path.Combine(DirectoryFullName, AlertFile);
+            if (!File.Exists(AlertFile))
             {
-                DebugWindow.LogError($"IconBuilder -> ALERT_CONFIG file not found: {ALERT_CONFIG}");
+                DebugWindow.LogError($"IconsBuilder -> Alert entities file does not exist. Path: {path}");
+                return;
             }
-            var readAllLines = File.ReadAllLines(ALERT_CONFIG);
+            var readAllLines = File.ReadAllLines(AlertFile);
 
             foreach (var readAllLine in readAllLines)
             {
                 if (readAllLine.StartsWith("#")) continue;
-                var s = readAllLine.Split(';');
-                var sz = s[2].Trim().Split(',');
-                modIcons[s[0]] = new Size2(int.Parse(sz[0]), int.Parse(sz[1]));
+                var entityMetadata = readAllLine.Split(';');
+                var iconSize = entityMetadata[2].Trim().Split(',');
+                AlertEntitiesWithIconSize[entityMetadata[0]] = new Size2(int.Parse(iconSize[0]), int.Parse(iconSize[1]));
             }
         }
         private void ReadIgnoreFile()
         {
-            var path = Path.Combine(DirectoryFullName, IGNORE_FILE);
-            if (File.Exists(path))
+            var path = Path.Combine(DirectoryFullName, IgnoreFile);
+            if (!File.Exists(path))
             {
-                IgnoredEntities = File.ReadAllLines(path).Where(line => !string.IsNullOrWhiteSpace(line) && !line.StartsWith("#")).ToList();
+                LogError($"IconsBuilder -> Ignored entities file does not exist. Path: {path}");
+                return;
             }
-            else
-            {
-                LogError($"Ignored entities file does not exist. Path: {path}");
-            }
+            IgnoredEntities = File.ReadAllLines(path).Where(line => !string.IsNullOrWhiteSpace(line) && !line.StartsWith("#")).ToList();
         }
 
         public override void OnLoad()
@@ -77,8 +75,6 @@ namespace IconsBuilder
 
         public override void EntityAdded(Entity entity)
         {
-            if (!Settings.Enable.Value) return;
-
             _entities.Enqueue(entity);
         }
 
@@ -89,23 +85,17 @@ namespace IconsBuilder
 
         public override bool Initialise()
         {
-            LoadConfig();           
+            ReadAlertFile();           
             ReadIgnoreFile();
             return true;
         }
 
         public override Job Tick()
         {
-            if (!Settings.Enable.Value) return null;
-
-            if (Settings.MultiThreading && _entities.Count >= Settings.MultiThreadingWhenEntityMoreThan)
-                return GameController.MultiThreadManager.AddJob(TickLogic, nameof(IconsBuilder));
-
-            TickLogic();
-            return null;
+            return new Job("IconsBuilder", AddIcons);
         }
 
-        private void TickLogic()
+        private void AddIcons()
         {
             while (_entities.Count > 0)
             {
@@ -130,7 +120,7 @@ namespace IconsBuilder
         {
             if (entity == null) return true;
             if (!entity.IsValid) return true;
-            if (SkippedEntity.AnyF(x => x == entity.Type)) return true;
+            if (SkippedEntityTypes.AnyF(x => x == entity.Type)) return true;
             if (IgnoredEntities.AnyF(x => entity?.Path?.Contains(x) == true)) return true;
 
             return false;
@@ -144,11 +134,11 @@ namespace IconsBuilder
                 if (!entity.IsAlive) return null;
 
                 if (entity.League == LeagueType.Legion)
-                    return new LegionIcon(entity, GameController, Settings, modIcons);
+                    return new LegionIcon(entity, GameController, Settings, AlertEntitiesWithIconSize);
                 if (entity.League == LeagueType.Delirium)
-                    return new DeliriumIcon(entity, GameController, Settings, modIcons);
+                    return new DeliriumIcon(entity, GameController, Settings, AlertEntitiesWithIconSize);
 
-                return new MonsterIcon(entity, GameController, Settings, modIcons);
+                return new MonsterIcon(entity, GameController, Settings, AlertEntitiesWithIconSize);
             }
 
             //NPC
@@ -162,7 +152,7 @@ namespace IconsBuilder
                     GameController.IngameState.Data.LocalPlayer.GetComponent<Render>().Name == entity.RenderName) return null;
 
                 if (!entity.IsValid) return null;
-                return new PlayerIcon(entity, GameController, Settings, modIcons);
+                return new PlayerIcon(entity, GameController, Settings, AlertEntitiesWithIconSize);
             }
 
             //Chests
